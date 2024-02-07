@@ -1,3 +1,4 @@
 *.pdf
 *.txt
 /answer.py
+__pycache__/

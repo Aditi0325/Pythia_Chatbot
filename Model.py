@@ -82,12 +82,6 @@ def process_prompt(prompt):
 initialize_llm()
 
 chain = process_pdf("data/DeepLearning.pdf", llm)
-while True:
-        prompt = input("Ask a question about the document: ")
-        chat_history = []
-        if prompt == "quit":
-            break
-        response = process_prompt(prompt)
-        print(response)
+
 
 
