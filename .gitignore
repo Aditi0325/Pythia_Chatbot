@@ -1,4 +1,3 @@
 *.pdf
-
 /answer.py
 __pycache__/
