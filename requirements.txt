@@ -1,0 +1,13 @@
+PyPDF2
+langchain
+torch
+awa
+awadb
+faiss-cpu
+huggingface_hub
+datasets
+fastapi uvicorn
+numpy
+chromadb
+sentence-transformers
+langchain_community

@@ -1,35 +1,46 @@
-from fastapi import FastAPI
 import uvicorn
-from Model import initialize_llm, process_pdf, process_prompt
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 
+# Import the necessary methods from your Model module
+from Model import initialize_llm, process_hf_dataset, process_prompt
+
+# Initialize FastAPI app
 app = FastAPI()
 
-# Initialize the language model and processing chain
-initialize_llm()
+# Initialize the language model when the app starts
+llm = initialize_llm()
 
 @app.get("/")
 def check():
     return {"message": "Hello World!"}
 
-# Define API endpoints
-@app.post("/upload-pdf")
-async def upload_pdf():
-    # Specify the path to the PDF file
-    pdf_path = "data/DeepLearning.pdf"
+# Define request body model
+class TrainModelRequest(BaseModel):
+    dataset_name: str
+    page_content_column: str
+    name: str
 
-    # Process the PDF and build the retrieval chain
-    process_pdf(pdf_path)
+# Define endpoint to train model with dataset name
+@app.post("/train_model/")
+async def train_model(request: TrainModelRequest):
+    try:
+        # Call method to process dataset in your Model class
+        process_hf_dataset(request.dataset_name, page_content_column=request.page_content_column, name=request.name, llm=llm)
+        return {"message": f"Model trained with dataset: {request.dataset_name}, page_content_column: {request.page_content_column}, and name: {request.name}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return {"message": "PDF processed successfully"}
+# Define endpoint for processing user prompt
+@app.post("/process_prompt/")
+async def process_user_prompt(prompt: str):
+    try:
+        # Call method to process user prompt in your Model class
+        response = process_prompt(prompt)
+        return {"response": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/prompt")
-async def process_user_prompt(prompt_data: dict):
-    # Extract prompt from the request body
-    prompt = prompt_data.get('prompt', '')
-
-    # Process user prompt and return response
-    response = process_prompt(prompt)
-    return {"response": response}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+     uvicorn.run(app, host="0.0.0.0", port=8000)
