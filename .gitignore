@@ -1,3 +1,5 @@
 *.pdf
 /answer.py
 __pycache__/
+*.gguf
+chroma_db/

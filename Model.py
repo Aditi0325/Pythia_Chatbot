@@ -1,5 +1,4 @@
 import numpy as np 
-from langchain_community.llms import HuggingFaceHub
 from langchain_community.document_loaders.hugging_face_dataset import (
     HuggingFaceDatasetLoader,
 )
@@ -10,41 +9,42 @@ from langchain_community.vectorstores.utils import filter_complex_metadata
 from langchain_community.embeddings.sentence_transformer import (
     SentenceTransformerEmbeddings,
 )
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain_community.llms import GPT4All
 
 chat_history = []
 llm = None
 llm_embeddings = None
 conversation_retrieval_chain = None
-db = None
+#db = None
 db2 = None
 db3 = None
+is_trained = False
+
 
 # Initialize the language model and do the embedding stuff
 def initialize_llm():
-    global llm, llm_embeddings
+    global llm
     """Initializes the language model and embeddings.
 
     Returns:
         tuple: A tuple containing the initialized LLM and embeddings objects.
     """
 
-   
-
-    llm = HuggingFaceHub(
-        repo_id="HuggingFaceH4/zephyr-7b-beta",
-        task="text-generation",
-        model_kwargs={
-            "max_new_tokens": 512,
-            "top_k": 30,
-            "temperature": 0.1,
-            "repetition_penalty": 1.03,
-        },
+    local_path = (
+        "./gpt4all-falcon.gguf"  # replace with your desired local file path
     )
+
+    # Callbacks support token-wise streaming
+    callbacks = [StreamingStdOutCallbackHandler()]
+
+    # Verbose is required to pass to the callback manager
+    llm = GPT4All(model=local_path, callbacks=callbacks, verbose=True)
     return llm
 
 # Process a Document 
 def process_hf_dataset(dataset_name, page_content_column, name, llm):
-    global llm_embeddings, conversation_retrieval_chain, db, db2, db3
+    global llm_embeddings, conversation_retrieval_chain, db2, db3, is_trained
     """Processes a dataset from Hugging Face and creates a conversational retrieval chain.
 
     Args:
@@ -71,7 +71,7 @@ def process_hf_dataset(dataset_name, page_content_column, name, llm):
     llm_embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
     # Initialize and save Chroma vector store
-    db = Chroma.from_documents(texts, llm_embeddings)
+    #db = Chroma.from_documents(texts, llm_embeddings)
 
     # Save to the disk
     db2 = Chroma.from_documents(texts, llm_embeddings, persist_directory="./chroma_db")
@@ -81,23 +81,24 @@ def process_hf_dataset(dataset_name, page_content_column, name, llm):
     retriever = db3.as_retriever(search_type="similarity", search_kwargs={"k": 2})
 
     conversation_retrieval_chain = ConversationalRetrievalChain.from_llm(llm, retriever)
+    is_trained = True
     return conversation_retrieval_chain
+
 
 # User Prompt
 def process_prompt(prompt):
-   """Processes a user prompt and returns the response from the conversational retrieval chain.
+   global conversation_retrieval_chain, llm, chat_history
 
-   Args:
-       prompt (str): The user's prompt.
+   if is_trained:
+      result = conversation_retrieval_chain({"question": prompt, "chat_history": chat_history})
+   else:
+      result = llm(prompt)
 
-   Returns:
-       str: The response from the conversational retrieval chain.
-   """
-
-   global conversation_retrieval_chain
-   global chat_history
-
-   result = conversation_retrieval_chain({"question": prompt, "chat_history": chat_history})
    chat_history.append((prompt, result['answer']))
-
    return result['answer']
+
+
+
+
+
+

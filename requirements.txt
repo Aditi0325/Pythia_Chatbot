@@ -11,3 +11,4 @@ numpy
 chromadb
 sentence-transformers
 langchain_community
+gpt4all
