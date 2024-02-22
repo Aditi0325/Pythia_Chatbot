@@ -20,7 +20,7 @@ class TrainModelRequest(BaseModel):
     dataset_name: str
     page_content_column: str
     name: str
-
+    
 class ProcessPromptRequest(BaseModel):
     prompt: str
 
