@@ -32,7 +32,7 @@ def initialize_llm():
     """
 
     local_path = (
-        "./gpt4all-falcon.gguf"  # replace with your desired local file path
+        "./mistral.gguf"  # replace with your desired local file path
     )
 
     # Callbacks support token-wise streaming
@@ -41,6 +41,16 @@ def initialize_llm():
     # Verbose is required to pass to the callback manager
     llm = GPT4All(model=local_path, callbacks=callbacks, verbose=True)
     return llm
+
+def load_data():
+    global conversation_retrieval_chain, llm
+    llm_embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2") 
+    db3 = Chroma(persist_directory="./chroma_db", embedding_function=llm_embeddings)
+    retriever = db3.as_retriever(search_type="similarity", search_kwargs={"k": 2})
+
+    conversation_retrieval_chain = ConversationalRetrievalChain.from_llm(llm, retriever)
+
+
 
 # Process a Document 
 def process_hf_dataset(dataset_name, page_content_column, name, llm):
@@ -81,7 +91,6 @@ def process_hf_dataset(dataset_name, page_content_column, name, llm):
     retriever = db3.as_retriever(search_type="similarity", search_kwargs={"k": 2})
 
     conversation_retrieval_chain = ConversationalRetrievalChain.from_llm(llm, retriever)
-    is_trained = True
     return conversation_retrieval_chain
 
 
@@ -89,16 +98,8 @@ def process_hf_dataset(dataset_name, page_content_column, name, llm):
 def process_prompt(prompt):
    global conversation_retrieval_chain, llm, chat_history
 
-   if is_trained:
-      result = conversation_retrieval_chain({"question": prompt, "chat_history": chat_history})
-   else:
-      result = llm(prompt)
+   print(prompt)
+   result = conversation_retrieval_chain({"question": prompt, "chat_history": []})
 
    chat_history.append((prompt, result['answer']))
    return result['answer']
-
-
-
-
-
-
