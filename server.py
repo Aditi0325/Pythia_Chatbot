@@ -21,15 +21,19 @@ class TrainModelRequest(BaseModel):
     dataset_name: str
     page_content_column: str
     name: str
-    
+
+# Class for processing prompts  
 class ProcessPromptRequest(BaseModel):
     prompt: str
 
+<<<<<<< HEAD
 # Class for processing prompts
 
 
 # Create an instance of the PromptProcessor class
 
+=======
+>>>>>>> a475b7f3c69980a6565f4269eca1f6c69e177c7f
 # Define endpoint to train model with dataset name
 @app.post("/train_model/")
 async def train_model(request: TrainModelRequest):
