@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 # Import the necessary methods from your Model module
 from Model import initialize_llm, load_data, process_hf_dataset, process_prompt
@@ -72,6 +73,13 @@ async def process_user_prompt(request: ProcessPromptRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins = ["*"],
+  allow_methods = ["*"],
+  allow_headers = ["*"]
+)
+
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+   uvicorn.run("server:app", host="127.0.0.1", port=8000, log_level="info")
