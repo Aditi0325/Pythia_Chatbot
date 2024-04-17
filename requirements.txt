@@ -6,7 +6,8 @@ awadb
 faiss-cpu
 huggingface_hub
 datasets
-fastapi uvicorn
+fastapi 
+uvicorn
 numpy
 chromadb
 sentence-transformers
