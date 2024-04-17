@@ -26,14 +26,6 @@ class TrainModelRequest(BaseModel):
 class ProcessPromptRequest(BaseModel):
     prompt: str
 
-<<<<<<< HEAD
-# Class for processing prompts
-
-
-# Create an instance of the PromptProcessor class
-
-=======
->>>>>>> a475b7f3c69980a6565f4269eca1f6c69e177c7f
 # Define endpoint to train model with dataset name
 @app.post("/train_model/")
 async def train_model(request: TrainModelRequest):
@@ -86,4 +78,4 @@ app.add_middleware(
 
 
 if __name__ == "__main__":
-   uvicorn.run("server:app", host="127.0.0.1", port=8000, log_level="info")
+   uvicorn.run("server:app", host="0.0.0.0", port=8000, log_level="info")
