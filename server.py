@@ -1,3 +1,4 @@
+from fastapi.responses import JSONResponse
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -72,9 +73,16 @@ async def process_user_prompt():
 async def process_user_prompt(request: ProcessPromptRequest):
     try:
         # Call method to process user prompt using the class
+        content = {"response": response}
+        headers = {
+  "Access-Control-Allow-Origin": "*", 
+  "Access-Control-Allow-Credentials": True,
+  "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+  "Access-Control-Allow-Methods": "POST, OPTIONS"
+},
         print(request.prompt)
         response = process_prompt(request.prompt)
-        return {"response": response}
+        return JSONResponse(content=content, headers=headers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 if __name__ == "__main__":
