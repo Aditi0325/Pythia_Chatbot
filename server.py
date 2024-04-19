@@ -74,7 +74,7 @@ async def process_user_prompt(request: ProcessPromptRequest):
         # Call method to process user prompt using the class
         print(request.prompt)
         response = process_prompt(request.prompt)
-        return {"response": response,}
+        return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 if __name__ == "__main__":
