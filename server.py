@@ -73,7 +73,6 @@ async def process_user_prompt():
 async def process_user_prompt(request: ProcessPromptRequest):
     try:
         # Call method to process user prompt using the class
-        content = {"response": response}
         headers = {
   "Access-Control-Allow-Origin": "*", 
   "Access-Control-Allow-Credentials": True,
@@ -82,6 +81,7 @@ async def process_user_prompt(request: ProcessPromptRequest):
 },
         print(request.prompt)
         response = process_prompt(request.prompt)
+        content = {"response": response}
         return JSONResponse(content=content, headers=headers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
