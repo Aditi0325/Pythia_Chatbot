@@ -3,11 +3,20 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
+
 # Import the necessary methods from your Model module
 from Model import initialize_llm, load_data, process_hf_dataset, process_prompt
 
 # Initialize FastAPI app
 app = FastAPI()
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Initialize the language model when the app starts
 llm = initialize_llm()
@@ -66,22 +75,13 @@ async def process_user_prompt(request: ProcessPromptRequest):
         print(request.prompt)
         response = process_prompt(request.prompt)
         return {"response": response,
-                headers: {
+                "headers": {
   "Access-Control-Allow-Origin": "*", 
-  "Access-Control-Allow-Credentials": true,
+  "Access-Control-Allow-Credentials": True,
   "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 },}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-app.add_middleware(
-  CORSMiddleware,
-  allow_origins = ["*"],
-  allow_methods = ["*"],
-  allow_headers = ["*"]
-)
-
-
 if __name__ == "__main__":
    uvicorn.run("server:app", host="0.0.0.0", port=8000, log_level="info")
