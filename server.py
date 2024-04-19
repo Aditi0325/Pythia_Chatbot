@@ -74,7 +74,7 @@ async def process_user_prompt(request: ProcessPromptRequest):
         # Call method to process user prompt using the class
         headers = {
   "Access-Control-Allow-Origin": "*", 
-  "Access-Control-Allow-Credentials": true,
+  "Access-Control-Allow-Credentials": True,
   "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 },
